@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="http://cdn.bootcss.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <link rel="stylesheet" href="http://cdn.bootcss.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
+    <script src="http://cdn.bootcss.com/jquery/1.11.2/jquery.min.js"></script>
+    <script src="http://cdn.bootcss.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+</head>
+<body>
+<!-- 分页 -->
+<ul id="pagination" class="pagination" data-current="4" data-max="20">
+    <li id="pageLeftLi">
+        <a id="pageLeft" aria-label="Previous">
+            <span aria-hidden="true">&laquo;</span>
+        </a>
+    </li>
+    <!--
+    <li><a href="#">1</a></li>
+    <li><a href="#">2</a></li>
+    <li><a href="#">3</a></li>
+    <li><a href="#">4</a></li>
+    <li><a href="#">5</a></li>-->
+    <li id="pageRightLi">
+        <a id="pageRight" aria-label="Next">
+            <span aria-hidden="true">&raquo;</span>
+        </a>
+    </li>
+</ul>
+<script>
+
+    (function($){
+        $.fn.extend({
+            pagination: function(obj){
+                $pagination=this;
+                $pageLeftLi=this.children('li:first');
+                $pageRightLi=this.children('li:last');
+                $pageLeftA=$pageLeftLi.children('a');
+                $pageRightA=$pageRightLi.children('a');
+
+                var href = (location.protocol+"//"+location.host);
+
+                if(location.pathname){
+                    href+=location.pathname;
+                }
+                if(location.search){
+                    href+=location.search.replace(/(page=[0-9]*)|(&page=[0-9]*)/, "");
+                }else{
+                    href+='?';
+                }
+                var currentPage=obj.current;//当前的页面 从1开始
+                var maxPage=obj.max; //页面的最大数
+
+               //如果当前为第一页 则向前一页的按钮不可用 否则即都可用
+                if(currentPage==1){
+                    $pageLeftLi.addClass('disabled');
+                }else{
+                    $pageLeftA.attr('href',href +'&page='+(currentPage-1)+location.hash);
+                }
+
+                //如果当前为最后一页 则向后一页的按钮不可用 否则即都可用
+                if(currentPage==maxPage){
+                    $pageRightLi.addClass('disabled');
+                }else{
+                    $pageRightA.attr('href',href +'&page='+(currentPage+1)+location.hash);
+                }
+
+                //添加分页中间的 1 2 3 4 5 ...页
+                var allHtml='';
+                if(maxPage<=5){ //如果总页数小于5 即直接显示 1 至 总页数
+                    for(var i=1;i<=maxPage;i++){
+                        allHtml+=('<li><a href='+href +'&page='+i+location.hash+'>'+i+'</a></li>');
+                    }
+                }else{
+                    if(currentPage<=3){ //如果当前页小于3 即处于总页的开头 则是显示 1 2 3 4 5
+                        for (var i = 1; i <= 5; i++) {
+                            allHtml+=('<li><a href='+href +'&page='+i+location.hash+'>'+i+'</a></li>');
+                        }
+                    }else{
+                        if(maxPage-currentPage<=3){ //如果当前页位于最后几页 则是显示 倒数的几页
+                            for (var i = 1, j = maxPage - 4; i <= 5; i++, j++) {
+                                allHtml+=('<li><a href='+href +'&page='+j+location.hash+'>'+j+'</a></li>');
+                            }
+                        }else{ //这里是处于中间 则显示从当前页的前2页开始到后2页
+                            for (var i = 1, j = currentPage - 2; i <= 5; i++, j++) {
+                                allHtml+=('<li><a href='+href +'&page='+j+location.hash+'>'+j+'</a></li>');
+                            }
+                        }
+                    }
+                }
+                $pageRightLi.before(allHtml);
+
+                //为当前页添加active状态
+                this.children('li').children('a').each(function(){
+                    if($(this).html()==(currentPage+"")){
+                        $(this).parent().addClass('active');
+                    }
+                });
+
+            }
+        });
+    })(jQuery);
+    $("#pagination").pagination({current:3,max:10});
+
+
+</script>
+</body>
+</html>
